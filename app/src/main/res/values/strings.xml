@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">CKO</string>
+
+    <!-- Payment View -->
+    <string name="card_number">Card Number</string>
+    <string name="expiry_date">Expiry Date</string>
+    <string name="expiry_date_placeholder">MM/YY</string>
+    <string name="cvv">CVV</string>
+    <string name="payment_button">PAY</string>
+
+    <!-- Payment Result View -->
+    <string name="payment_succeed">Payment Completed</string>
+    <string name="payment_fail">Payment Failed</string>
+</resources>

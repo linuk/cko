@@ -10,9 +10,10 @@ import com.linuk.cko.payment.ViewType.ThreeDS
 @Composable
 fun PaymentView(viewModel: PaymentViewModel) {
     val viewType by viewModel.viewType.observeAsState()
+    val paymentUtils = PaymentUtils()
 
     when (viewType) {
-        PaymentDetails -> PaymentDetailsView(viewModel)
+        PaymentDetails -> PaymentDetailsView(viewModel, paymentUtils)
         is PaymentResult -> PaymentResultView(viewModel, (viewType as PaymentResult).isSuccessful)
         is ThreeDS -> ThreeDSView(viewModel, (viewType as ThreeDS).url)
         else -> {}

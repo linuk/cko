@@ -16,6 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import com.linuk.cko.data.PaymentRepository
+import com.linuk.cko.payment.PaymentUtils.Companion.FAILURE_PAYMENT_REDIRECTION_URL
+import com.linuk.cko.payment.PaymentUtils.Companion.SUCCESS_PAYMENT_REDIRECTION_URL
 import com.linuk.cko.ui.theme.CKOTheme
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -67,7 +70,10 @@ fun ThreeDSPreview() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
         ) {
-            ThreeDSView(PaymentViewModel(), "https://tinyurl.com/hey33")
+            ThreeDSView(
+                PaymentViewModel(PaymentRepository(), PaymentUtils()),
+                "https://tinyurl.com/hey33"
+            )
         }
     }
 }

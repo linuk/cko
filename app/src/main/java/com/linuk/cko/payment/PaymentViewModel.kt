@@ -3,8 +3,16 @@ package com.linuk.cko.payment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.linuk.cko.data.PaymentRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import org.jetbrains.annotations.TestOnly
+import javax.inject.Inject
 
-class PaymentViewModel : ViewModel() {
+@HiltViewModel
+class PaymentViewModel @Inject constructor(
+    private val repository: PaymentRepository,
+    private val utils: PaymentUtils,
+) : ViewModel() {
     private val _viewType by lazy { MutableLiveData<ViewType>(ViewType.PaymentDetails) }
     private val _cardNumber by lazy { MutableLiveData("") }
     private val _expiryMonth by lazy { MutableLiveData("") }
@@ -25,55 +33,86 @@ class PaymentViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> = _isLoading
     val errorMessage: LiveData<String?> = _errorMessage
 
-    fun onViewChanged(view: ViewType) = _viewType.postValue(view)
+    fun onViewChanged(view: ViewType) {
+        _viewType.postValue(view)
+    }
+
+    @TestOnly
+    fun onViewChangedOnMainThread(view: ViewType) {
+        _viewType.value = view
+    }
 
     fun onCardNumberChanged(number: String) {
         _cardNumber.value = number
-        getCardType(number)
+        utils.getCardType(number)
             .takeIf { it != cardType.value }
             ?.let { type -> _cardType.value = type }
         maybeEnableButton()
     }
 
     fun onExpiryMonthChanged(month: String) {
-        if (isMonthUpdateValid(month)) {
+        if (utils.isMonthUpdateValid(month)) {
             _expiryMonth.value = month
             maybeEnableButton()
         }
     }
 
     fun onExpiryYearChanged(year: String) {
-        if (isYearUpdateValid(year)) {
+        if (utils.isYearUpdateValid(year)) {
             _expiryYear.value = year
             maybeEnableButton()
         }
     }
 
     fun onCvvChanged(cvv: String) {
-        if (isCvvUpdateValid(cvv, cardType.value)) {
+        if (utils.isCvvUpdateValid(cvv, cardType.value)) {
             _cvv.value = cvv
             maybeEnableButton()
         }
     }
 
-    fun onButtonPressed() = _isLoading.postValue(true)
-
-    fun onPaymentRequestDone() = _isLoading.postValue(false)
-
-    fun onErrorMessageReceived(message: String) = _errorMessage.postValue(message)
-
     fun onErrorDialogDone() = _errorMessage.postValue(null)
 
-    fun areFieldsValid(): Boolean = cardNumber.value?.let {
-        isCardNumberDigitsValid(it, cardType.value) && isCardNumberValid(cardNumber.value)
-    } == true &&
-            expiryYear.value?.let { isYearValid(it) } == true &&
-            expiryMonth.value?.let { isMonthValid(it) } == true &&
-            cvv.value?.let { isCvvValid(it, cardType.value) } == true
+    private fun areFieldsValid(): Boolean =
+        cardNumber.value?.let {
+            utils.isCardNumberDigitsValid(it.length, cardType.value) &&
+                    utils.isCardNumberValid(cardNumber.value)
+        } == true &&
+                expiryYear.value?.let { utils.isYearValid(it) } == true &&
+                expiryMonth.value?.let { utils.isMonthValid(it) } == true &&
+                cvv.value?.let { utils.isCvvValid(it, cardType.value) } == true
 
     private fun maybeEnableButton() {
         val isValid = areFieldsValid()
         if (isValid != buttonEnabled.value) _buttonEnabled.postValue(isValid)
+    }
+
+    fun maybeMakePayment() {
+        if (areFieldsValid()) {
+            _isLoading.postValue(true)
+            performMakingPayment()
+        }
+    }
+
+    private fun performMakingPayment() {
+        val cardDetails = CardDetails(
+            number = cardNumber.value ?: "",
+            expiryMonth = expiryMonth.value ?: "",
+            expiryYear = expiryYear.value ?: "",
+            cvv = cvv.value ?: ""
+        )
+
+        repository.makePayment(
+            cardDetails,
+            { url ->
+                _isLoading.postValue(false)
+                onViewChanged(ViewType.ThreeDS(url))
+            },
+            { message ->
+                _isLoading.postValue(false)
+                _errorMessage.postValue(message)
+            }
+        )
     }
 }
 

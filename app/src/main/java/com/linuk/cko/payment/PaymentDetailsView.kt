@@ -10,12 +10,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.linuk.cko.R
+import com.linuk.cko.data.PaymentRepository
+import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_CVV
+import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_EXP_MONTH
+import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_EXP_YEAR
+import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_INVALID_NUMBER
+import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_VALID_NUMBER
 import com.linuk.cko.ui.common.*
 import com.linuk.cko.ui.theme.CKOTheme
 import com.linuk.cko.ui.theme.Dimen.MEDIUM
@@ -31,7 +36,7 @@ private val FIELD_SPACE by lazy { SMALL }
  */
 @OptIn(ExperimentalComposeUiApi::class) // For Keyboard controller
 @Composable
-fun PaymentDetailsView(viewModel: PaymentViewModel) {
+fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
     val cardNumber by viewModel.cardNumber.observeAsState("")
     val expiryMonth by viewModel.expiryMonth.observeAsState("")
     val expiryYear by viewModel.expiryYear.observeAsState("")
@@ -53,9 +58,7 @@ fun PaymentDetailsView(viewModel: PaymentViewModel) {
     ) {
         errorMessage?.let { ErrorDialog(errorMessage!!) { viewModel.onErrorDialogDone() } }
 
-        Column(
-            modifier = Modifier.padding(MEDIUM), horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.padding(MEDIUM), horizontalAlignment = Alignment.CenterHorizontally) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CardNumberField(
                     modifier = Modifier.weight(0.8f), cardNumber,
@@ -65,7 +68,7 @@ fun PaymentDetailsView(viewModel: PaymentViewModel) {
                     enabled = !isLoading
                 )
 
-                getCardTypeImageRes(cardType)?.let { imageRes ->
+                utils.getCardTypeImageRes(cardType)?.let { imageRes ->
                     Image(
                         painter = painterResource(imageRes),
                         contentDescription = cardType.name,
@@ -77,7 +80,6 @@ fun PaymentDetailsView(viewModel: PaymentViewModel) {
             }
 
             Row(modifier = Modifier.padding(top = FIELD_SPACE / 2)) {
-                // Expiry Month
                 ExpiryMonthField(
                     modifier = Modifier
                         .padding(end = FIELD_SPACE)
@@ -87,7 +89,6 @@ fun PaymentDetailsView(viewModel: PaymentViewModel) {
                     enabled = !isLoading,
                 )
 
-                // Expiry Year
                 ExpiryYearField(
                     modifier = Modifier
                         .padding(end = FIELD_SPACE)
@@ -97,7 +98,6 @@ fun PaymentDetailsView(viewModel: PaymentViewModel) {
                     enabled = !isLoading,
                 )
 
-                // CVV
                 CvvField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -113,9 +113,12 @@ fun PaymentDetailsView(viewModel: PaymentViewModel) {
                     .padding(top = FIELD_SPACE)
                     .fillMaxWidth(),
                 content = { Text(stringResource(if (isLoading) R.string.payment_button_loading else R.string.payment_button)) },
-                onClick = { handlePaymentButtonClick(viewModel, keyboardController) })
+                onClick = {
+                    keyboardController?.hide()
+                    viewModel.maybeMakePayment()
+                })
 
-            // DEBUG Usage
+            // DEBUG ONLY
             Row {
                 OutlinedButton(modifier = Modifier
                     .padding(top = FIELD_SPACE, end = FIELD_SPACE / 2)
@@ -142,39 +145,15 @@ private fun onDebugButtonClick(cardNumber: String, viewModel: PaymentViewModel) 
     viewModel.onCvvChanged(DEBUG_CARD_CVV)
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
-private fun handlePaymentButtonClick(
-    viewModel: PaymentViewModel,
-    keyboardController: SoftwareKeyboardController?,
-) {
-    viewModel.onButtonPressed()
-    keyboardController?.hide()
-    if (viewModel.areFieldsValid()) {
-        val cardDetails = CardDetails(
-            number = viewModel.cardNumber.value ?: "",
-            expiryMonth = viewModel.expiryMonth.value ?: "",
-            expiryYear = viewModel.expiryYear.value ?: "",
-            cvv = viewModel.cvv.value ?: ""
-        )
-        PaymentRepository().makePayment(
-            cardDetails, { url ->
-                viewModel.onPaymentRequestDone()
-                viewModel.onViewChanged(ViewType.ThreeDS(url))
-            }, { message ->
-                viewModel.onPaymentRequestDone()
-                viewModel.onErrorMessageReceived(message)
-            })
-    } else {
-        viewModel.onPaymentRequestDone()
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     CKOTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-            PaymentDetailsView(PaymentViewModel())
+            PaymentDetailsView(
+                PaymentViewModel(PaymentRepository(), PaymentUtils()),
+                PaymentUtils()
+            )
         }
     }
 }

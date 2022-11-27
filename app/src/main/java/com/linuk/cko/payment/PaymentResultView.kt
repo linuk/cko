@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.linuk.cko.R
+import com.linuk.cko.data.PaymentRepository
 import com.linuk.cko.ui.theme.CKOTheme
 import com.linuk.cko.ui.theme.Cyan400
 import com.linuk.cko.ui.theme.Dimen
@@ -95,7 +96,7 @@ fun PaymentResultSuccessPreview() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
         ) {
-            PaymentResultView(PaymentViewModel(), true)
+            PaymentResultView(PaymentViewModel(PaymentRepository(), PaymentUtils()), true)
         }
     }
 }
@@ -107,7 +108,7 @@ fun PaymentResultFailPreview() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
         ) {
-            PaymentResultView(PaymentViewModel(), false)
+            PaymentResultView(PaymentViewModel(PaymentRepository(), PaymentUtils()), false)
         }
     }
 }

@@ -3,6 +3,7 @@ package com.linuk.cko.payment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.linuk.cko.data.CardDetails
 import com.linuk.cko.data.PaymentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.jetbrains.annotations.TestOnly
@@ -15,6 +16,7 @@ class PaymentViewModel @Inject constructor(
 ) : ViewModel() {
     private val _viewType by lazy { MutableLiveData<ViewType>(ViewType.PaymentDetails) }
     private val _cardNumber by lazy { MutableLiveData("") }
+    private val _isCardNumberInvalid by lazy { MutableLiveData(false) }
     private val _expiryMonth by lazy { MutableLiveData("") }
     private val _expiryYear by lazy { MutableLiveData("") }
     private val _cvv by lazy { MutableLiveData("") }
@@ -25,6 +27,7 @@ class PaymentViewModel @Inject constructor(
 
     val viewType: LiveData<ViewType> = _viewType
     val cardNumber: LiveData<String> = _cardNumber
+    val isCardNumberInvalid: LiveData<Boolean> = _isCardNumberInvalid
     val expiryMonth: LiveData<String> = _expiryMonth
     val expiryYear: LiveData<String> = _expiryYear
     val cvv: LiveData<String> = _cvv
@@ -43,11 +46,14 @@ class PaymentViewModel @Inject constructor(
     }
 
     fun onCardNumberChanged(number: String) {
-        _cardNumber.value = number
-        utils.getCardType(number)
-            .takeIf { it != cardType.value }
-            ?.let { type -> _cardType.value = type }
-        maybeEnableButton()
+        val newCardType = utils.getCardType(number)
+        if (utils.isCardNumberUpdateValid(number.length, newCardType)) {
+            _cardNumber.value = number
+            maybeEnableButton()
+            if (newCardType != cardType.value){
+                _cardType.value = newCardType
+            }
+        }
     }
 
     fun onExpiryMonthChanged(month: String) {
@@ -75,8 +81,14 @@ class PaymentViewModel @Inject constructor(
 
     private fun areFieldsValid(): Boolean =
         cardNumber.value?.let {
-            utils.isCardNumberDigitsValid(it.length, cardType.value) &&
-                    utils.isCardNumberValid(cardNumber.value)
+            val isDigitsValid = utils.isCardNumberDigitsValid(it.length, cardType.value)
+            val isNumberValid = utils.isCardNumberValid(cardNumber.value)
+
+            val isNumberFullyFilledButInValid = isDigitsValid && !isNumberValid
+            if (_isCardNumberInvalid.value != isNumberFullyFilledButInValid) {
+                _isCardNumberInvalid.postValue(isNumberFullyFilledButInValid)
+            }
+            return@let isDigitsValid && isNumberValid
         } == true &&
                 expiryYear.value?.let { utils.isYearValid(it) } == true &&
                 expiryMonth.value?.let { utils.isMonthValid(it) } == true &&

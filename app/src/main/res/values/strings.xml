@@ -3,6 +3,7 @@
 
     <!-- Payment View -->
     <string name="card_number">Card Number</string>
+    <string name="card_number_incorrect">Card Number Incorrect</string>
     <string name="expiry_month">Exp Month</string>
     <string name="expiry_year">Exp Year</string>
     <string name="expiry_month_placeholder">MM</string>

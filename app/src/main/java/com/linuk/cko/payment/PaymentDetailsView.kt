@@ -38,6 +38,7 @@ private val FIELD_SPACE by lazy { SMALL }
 @Composable
 fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
     val cardNumber by viewModel.cardNumber.observeAsState("")
+    val isCardNumberInvalid by viewModel.isCardNumberInvalid.observeAsState(false)
     val expiryMonth by viewModel.expiryMonth.observeAsState("")
     val expiryYear by viewModel.expiryYear.observeAsState("")
     val cvv by viewModel.cvv.observeAsState("")
@@ -65,6 +66,7 @@ fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
                     onValueChange = { number ->
                         viewModel.onCardNumberChanged(number)
                     },
+                    isError = isCardNumberInvalid,
                     enabled = !isLoading
                 )
 

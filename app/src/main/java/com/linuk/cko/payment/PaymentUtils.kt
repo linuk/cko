@@ -35,18 +35,41 @@ class PaymentUtils @Inject constructor() {
         else -> null
     }
 
+    fun isCardNumberUpdateValid(numberLength: Int, cardType: CardType?) = when (cardType) {
+        CardType.MASTER -> numberLength <= MASTER_NUMBER_DIGITS
+        CardType.VISA -> numberLength <= VISA_NUMBER_DIGITS.maxOf { it }
+        CardType.AMEX -> numberLength <= AMEX_NUMBER_DIGITS
+        else -> numberLength <= MAX_CARD_NUMBER_DIGITS
+    }
+
     fun isCardNumberDigitsValid(numberLength: Int, cardType: CardType?) = when (cardType) {
-        CardType.MASTER -> numberLength == Companion.MASTER_NUMBER_DIGITS
+        CardType.MASTER -> numberLength == MASTER_NUMBER_DIGITS
         CardType.VISA -> VISA_NUMBER_DIGITS.contains(numberLength)
-        CardType.AMEX -> numberLength == Companion.AMEX_NUMBER_DIGITS
+        CardType.AMEX -> numberLength == AMEX_NUMBER_DIGITS
         else -> false
     }
 
     // Assuming the card number digits are correct, this should be called after
-// [isCardNumberDigitsValid] is validated
+    // [isCardNumberDigitsValid] is validated
+    // Detailed algo logic can be found on: https://en.wikipedia.org/wiki/Luhn_algorithm
     fun isCardNumberValid(number: String?): Boolean {
-        // TODO: Implement "Luhn Algorithm"
-        return true
+        if (number.isNullOrEmpty()) return false
+
+        val checkSum = number[number.length - 1] - '0'
+        var i = number.length - 2
+        var doubleNums = mutableListOf<Int>()
+        var singleNumSum = 0
+        while (i >= 0) {
+            doubleNums.add(number[i--] - '0')
+            if (i >= 0) singleNumSum += number[i--] - '0'
+        }
+        doubleNums = doubleNums
+            .map { it * 2 }
+            .map { if (it >= 10) it % 10 + it / 10 else it }
+            .toMutableList()
+        val sum = doubleNums.sum() + singleNumSum
+        val expectedCheckSum = (10 - (sum % 10)) % 10
+        return expectedCheckSum == checkSum
     }
 
     fun isCvvValid(cvv: String, cardType: CardType?) = when (cardType) {
@@ -90,6 +113,7 @@ class PaymentUtils @Inject constructor() {
         private const val VISA_CVV_DIGITS = 3
         private const val AMEX_NUMBER_DIGITS = 15
         private const val MASTER_NUMBER_DIGITS = 16
+        private const val MAX_CARD_NUMBER_DIGITS = 19
         private val VISA_NUMBER_DIGITS = listOf(13, 16)
         private val CURRENT_YEAR by lazy { LocalDate.now().year }
     }

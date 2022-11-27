@@ -130,4 +130,47 @@ class PaymentUtilsTest {
         assert(utils.isYearUpdateValid((currentYear + 1).toString()))
         assert(!utils.isYearUpdateValid((currentYear - 1).toString()))
     }
+
+    @Test
+    fun `is card number valid`() {
+        val validCardNumbers = listOf(
+            79927398713,
+            4242424242424242,
+            4243754271700719,
+            4005371662456930,
+            4005915091911392,
+        )
+
+        validCardNumbers.forEach { validNumber ->
+            assert(utils.isCardNumberValid(validNumber.toString()))
+        }
+
+        validCardNumbers.map { it + 1 }.forEach { invalidNumber ->
+            assert(!utils.isCardNumberValid(invalidNumber.toString()))
+        }
+    }
+
+    @Test
+    fun `is Master card number update valid`() {
+        (1..16).forEach { assert(utils.isCardNumberUpdateValid(it, CardType.MASTER)) }
+        (17..30).forEach { assert(!utils.isCardNumberUpdateValid(it, CardType.MASTER)) }
+    }
+
+    @Test
+    fun `is VISA card number update valid`() {
+        (1..16).forEach { assert(utils.isCardNumberUpdateValid(it, CardType.VISA)) }
+        (17..30).forEach { assert(!utils.isCardNumberUpdateValid(it, CardType.VISA)) }
+    }
+
+    @Test
+    fun `is AMEX card number update valid`() {
+        (1..15).forEach { assert(utils.isCardNumberUpdateValid(it, CardType.AMEX)) }
+        (16..30).forEach { assert(!utils.isCardNumberUpdateValid(it, CardType.AMEX)) }
+    }
+
+    @Test
+    fun `is default card number update valid`() {
+        (1..19).forEach { assert(utils.isCardNumberUpdateValid(it, CardType.DEFAULT)) }
+        (20..30).forEach { assert(!utils.isCardNumberUpdateValid(it, CardType.DEFAULT)) }
+    }
 }

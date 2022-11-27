@@ -24,16 +24,18 @@ fun CardNumberField(
     modifier: Modifier = Modifier,
     cardNumber: String,
     onValueChange: (number: String) -> Unit,
-    enabled: Boolean
+    isError: Boolean,
+    enabled: Boolean,
 ) {
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
         value = cardNumber,
         singleLine = true,
         enabled = enabled,
+        isError = isError,
         onValueChange = onValueChange,
         keyboardOptions = KEYBOARD_OPTIONS_NEXT,
-        label = { Text(stringResource(R.string.card_number)) },
+        label = { Text(stringResource(if (!isError) R.string.card_number else R.string.card_number_incorrect)) },
     )
 }
 

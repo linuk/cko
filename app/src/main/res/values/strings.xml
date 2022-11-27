@@ -3,12 +3,19 @@
 
     <!-- Payment View -->
     <string name="card_number">Card Number</string>
-    <string name="expiry_date">Expiry Date</string>
-    <string name="expiry_date_placeholder">MM/YY</string>
+    <string name="expiry_month">Expiry Month</string>
+    <string name="expiry_year">Expiry Year</string>
+    <string name="expiry_month_placeholder">MM</string>
+    <string name="expiry_year_placeholder">YYYY</string>
     <string name="cvv">CVV</string>
     <string name="payment_button">PAY</string>
+    <string name="payment_button_loading">Loading…</string>
 
     <!-- Payment Result View -->
-    <string name="payment_succeed">Payment Completed</string>
-    <string name="payment_fail">Payment Failed</string>
+    <string name="payment_succeed_title">Payment Completed!</string>
+    <string name="payment_fail_title">Payment Failed</string>
+    <string name="payment_succeed_description">The transaction has been completed successfully!</string>
+    <string name="payment_fail_description">Don\'t worry you will not be charged.</string>
+    <string name="payment_succeed_button">Done</string>
+    <string name="payment_fail_button">Retry</string>
 </resources>

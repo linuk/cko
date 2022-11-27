@@ -21,16 +21,17 @@ internal val KEYBOARD_OPTIONS_DONE by lazy { KEYBOARD_OPTIONS_NEXT.copy(imeActio
 
 @Composable
 fun CardNumberField(
+    modifier: Modifier = Modifier,
     cardNumber: String,
-    setCardNumber: (number: String) -> Unit,
+    onValueChange: (number: String) -> Unit,
     enabled: Boolean
 ) {
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         value = cardNumber,
         singleLine = true,
         enabled = enabled,
-        onValueChange = { setCardNumber(it) },
+        onValueChange = onValueChange,
         keyboardOptions = KEYBOARD_OPTIONS_NEXT,
         label = { Text(stringResource(R.string.card_number)) },
     )
@@ -40,7 +41,7 @@ fun CardNumberField(
 fun ExpiryMonthField(
     modifier: Modifier = Modifier,
     expiryMonth: String,
-    setExpiryMonth: (month: String) -> Unit,
+    onValueChange: (month: String) -> Unit,
     enabled: Boolean,
 ) {
     OutlinedTextField(
@@ -49,19 +50,17 @@ fun ExpiryMonthField(
         enabled = enabled,
         placeholder = { Text(text = stringResource(R.string.expiry_month_placeholder)) },
         singleLine = true,
-        onValueChange = { month -> if (isMonthValid(month)) setExpiryMonth(month) },
+        onValueChange = onValueChange,
         keyboardOptions = KEYBOARD_OPTIONS_NEXT,
         label = { Text(stringResource(R.string.expiry_month)) },
     )
 }
 
-private fun isMonthValid(month: String) = month.isEmpty() || month.toInt() <= 12
-
 @Composable
 fun ExpiryYearField(
     modifier: Modifier = Modifier,
     expiryYear: String,
-    setExpiryYear: (month: String) -> Unit,
+    onValueChange: (year: String) -> Unit,
     enabled: Boolean,
 ) {
     // Expiry Year
@@ -71,20 +70,17 @@ fun ExpiryYearField(
         enabled = enabled,
         placeholder = { Text(text = stringResource(R.string.expiry_year_placeholder)) },
         singleLine = true,
-        onValueChange = { year -> if (isYearValid(year)) setExpiryYear(year) },
+        onValueChange = onValueChange,
         keyboardOptions = KEYBOARD_OPTIONS_NEXT,
         label = { Text(stringResource(R.string.expiry_year)) },
     )
 }
 
-private fun isYearValid(year: String) = year.length <= 4
-
 @Composable
 fun CvvField(
     modifier: Modifier = Modifier,
     cvv: String,
-    setCvv: (month: String) -> Unit,
-    cvvMaxLength: Int,
+    onValueChange: (cvv: String) -> Unit,
     enabled: Boolean,
 ) {
     OutlinedTextField(
@@ -92,7 +88,7 @@ fun CvvField(
         value = cvv,
         singleLine = true,
         enabled = enabled,
-        onValueChange = { if (it.length <= cvvMaxLength) setCvv(it) },
+        onValueChange = onValueChange,
         keyboardOptions = KEYBOARD_OPTIONS_DONE,
         label = { Text(stringResource(R.string.cvv)) },
     )

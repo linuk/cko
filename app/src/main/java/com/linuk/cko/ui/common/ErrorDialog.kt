@@ -15,18 +15,18 @@ import com.linuk.cko.ui.theme.Red400
 @Composable
 fun ErrorDialog(
     errorMessage: String,
-    setErrorMessage: (message: String) -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         modifier = Modifier.padding(Dimen.MEDIUM),
-        onDismissRequest = { setErrorMessage("") },
+        onDismissRequest = onDismiss,
         text = { Text(errorMessage) },
         buttons = {
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(Dimen.MEDIUM),
-                onClick = { setErrorMessage("") },
+                onClick = onDismiss,
                 content = { Text("DONE") },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Red400,

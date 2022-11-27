@@ -3,8 +3,8 @@
 
     <!-- Payment View -->
     <string name="card_number">Card Number</string>
-    <string name="expiry_month">Expiry Month</string>
-    <string name="expiry_year">Expiry Year</string>
+    <string name="expiry_month">Exp Month</string>
+    <string name="expiry_year">Exp Year</string>
     <string name="expiry_month_placeholder">MM</string>
     <string name="expiry_year_placeholder">YYYY</string>
     <string name="cvv">CVV</string>

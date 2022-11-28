@@ -1,4 +1,4 @@
-package com.linuk.cko.payment
+package com.linuk.cko.payment.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -10,17 +10,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.linuk.cko.R
-import com.linuk.cko.data.PaymentRepository
-import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_CVV
-import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_EXP_MONTH
-import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_EXP_YEAR
-import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_INVALID_NUMBER
-import com.linuk.cko.payment.PaymentUtils.Companion.DEBUG_CARD_VALID_NUMBER
+import com.linuk.cko.data.PaymentRepositoryImpl
+import com.linuk.cko.payment.CardType
+import com.linuk.cko.api.PaymentUtils
+import com.linuk.cko.payment.PaymentUtilsImpl
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.DEBUG_CARD_CVV
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.DEBUG_CARD_EXP_MONTH
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.DEBUG_CARD_EXP_YEAR
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.DEBUG_CARD_INVALID_NUMBER
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.DEBUG_CARD_VALID_NUMBER
+import com.linuk.cko.payment.PaymentViewModel
 import com.linuk.cko.ui.common.*
 import com.linuk.cko.ui.theme.CKOTheme
 import com.linuk.cko.ui.theme.Dimen.MEDIUM
@@ -28,6 +33,11 @@ import com.linuk.cko.ui.theme.Dimen.SMALL
 
 
 private val FIELD_SPACE by lazy { SMALL }
+internal const val CARD_NUMBER_FIELD_TEST_TAG = "CARD_NUMBER_FIELD_TEST_TAG"
+internal const val EXPIRY_MONTH_FIELD_TEST_TAG = "EXPIRY_MONTH_FIELD_TEST_TAG"
+internal const val EXPIRY_YEAR_FIELD_TEST_TAG = "EXPIRY_YEAR_FIELD_TEST_TAG"
+internal const val CVV_FIELD_TEST_TAG = "CVV_FIELD_TEST_TAG"
+internal const val BUTTON_TEST_TAG = "BUTTON_TEST_TAG"
 
 /**
  * Initial Screen for the payment view
@@ -59,13 +69,17 @@ fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
     ) {
         errorMessage?.let { ErrorDialog(errorMessage!!) { viewModel.onErrorDialogDone() } }
 
-        Column(modifier = Modifier.padding(MEDIUM), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.padding(MEDIUM),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CardNumberField(
-                    modifier = Modifier.weight(0.8f), cardNumber,
-                    onValueChange = { number ->
-                        viewModel.onCardNumberChanged(number)
-                    },
+                    modifier = Modifier
+                        .weight(0.8f)
+                        .testTag(CARD_NUMBER_FIELD_TEST_TAG),
+                    cardNumber = cardNumber,
+                    onValueChange = { number -> viewModel.onCardNumberChanged(number) },
                     isError = isCardNumberInvalid,
                     enabled = !isLoading
                 )
@@ -85,7 +99,8 @@ fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
                 ExpiryMonthField(
                     modifier = Modifier
                         .padding(end = FIELD_SPACE)
-                        .weight(0.4f),
+                        .weight(0.4f)
+                        .testTag(EXPIRY_MONTH_FIELD_TEST_TAG),
                     expiryMonth = expiryMonth,
                     onValueChange = { viewModel.onExpiryMonthChanged(it) },
                     enabled = !isLoading,
@@ -94,7 +109,8 @@ fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
                 ExpiryYearField(
                     modifier = Modifier
                         .padding(end = FIELD_SPACE)
-                        .weight(0.4f),
+                        .weight(0.4f)
+                        .testTag(EXPIRY_YEAR_FIELD_TEST_TAG),
                     expiryYear = expiryYear,
                     onValueChange = { viewModel.onExpiryYearChanged(it) },
                     enabled = !isLoading,
@@ -103,7 +119,8 @@ fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
                 CvvField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.2f),
+                        .weight(0.2f)
+                        .testTag(CVV_FIELD_TEST_TAG),
                     cvv = cvv,
                     onValueChange = { viewModel.onCvvChanged(it) },
                     enabled = !isLoading,
@@ -113,7 +130,8 @@ fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
             Button(enabled = buttonEnabled && !isLoading,
                 modifier = Modifier
                     .padding(top = FIELD_SPACE)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag(BUTTON_TEST_TAG),
                 content = { Text(stringResource(if (isLoading) R.string.payment_button_loading else R.string.payment_button)) },
                 onClick = {
                     keyboardController?.hide()
@@ -153,8 +171,8 @@ fun DefaultPreview() {
     CKOTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
             PaymentDetailsView(
-                PaymentViewModel(PaymentRepository(), PaymentUtils()),
-                PaymentUtils()
+                PaymentViewModel(PaymentRepositoryImpl(), PaymentUtilsImpl()),
+                PaymentUtilsImpl()
             )
         }
     }

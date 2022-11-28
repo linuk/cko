@@ -4,9 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.linuk.cko.data.CardDetails
-import com.linuk.cko.data.PaymentRepository
+import com.linuk.cko.api.PaymentRepository
+import com.linuk.cko.payment.CardType
+import com.linuk.cko.api.PaymentUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import org.jetbrains.annotations.TestOnly
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,24 +26,19 @@ class PaymentViewModel @Inject constructor(
     private val _isLoading by lazy { MutableLiveData(false) }
     private val _errorMessage by lazy { MutableLiveData<String?>(null) }
 
-    val viewType: LiveData<ViewType> = _viewType
-    val cardNumber: LiveData<String> = _cardNumber
-    val isCardNumberInvalid: LiveData<Boolean> = _isCardNumberInvalid
-    val expiryMonth: LiveData<String> = _expiryMonth
-    val expiryYear: LiveData<String> = _expiryYear
-    val cvv: LiveData<String> = _cvv
-    val cardType: LiveData<CardType> = _cardType
-    val buttonEnabled: LiveData<Boolean> = _buttonEnabled
-    val isLoading: LiveData<Boolean> = _isLoading
-    val errorMessage: LiveData<String?> = _errorMessage
+    val viewType: LiveData<ViewType> by lazy { _viewType }
+    val cardNumber: LiveData<String> by lazy { _cardNumber }
+    val isCardNumberInvalid: LiveData<Boolean> by lazy { _isCardNumberInvalid }
+    val expiryMonth: LiveData<String> by lazy { _expiryMonth }
+    val expiryYear: LiveData<String> by lazy { _expiryYear }
+    val cvv: LiveData<String> by lazy { _cvv }
+    val cardType: LiveData<CardType> by lazy { _cardType }
+    val buttonEnabled: LiveData<Boolean> by lazy { _buttonEnabled }
+    val isLoading: LiveData<Boolean> by lazy { _isLoading }
+    val errorMessage: LiveData<String?> by lazy { _errorMessage }
 
     fun onViewChanged(view: ViewType) {
         _viewType.postValue(view)
-    }
-
-    @TestOnly
-    fun onViewChangedOnMainThread(view: ViewType) {
-        _viewType.value = view
     }
 
     fun onCardNumberChanged(number: String) {
@@ -50,7 +46,7 @@ class PaymentViewModel @Inject constructor(
         if (utils.isCardNumberUpdateValid(number.length, newCardType)) {
             _cardNumber.value = number
             maybeEnableButton()
-            if (newCardType != cardType.value){
+            if (newCardType != cardType.value) {
                 _cardType.value = newCardType
             }
         }

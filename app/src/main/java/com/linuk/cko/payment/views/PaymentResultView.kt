@@ -1,4 +1,4 @@
-package com.linuk.cko.payment
+package com.linuk.cko.payment.views
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -20,7 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.linuk.cko.R
-import com.linuk.cko.data.PaymentRepository
+import com.linuk.cko.data.PaymentRepositoryImpl
+import com.linuk.cko.payment.PaymentUtilsImpl
+import com.linuk.cko.payment.PaymentViewModel
+import com.linuk.cko.payment.ViewType
 import com.linuk.cko.ui.theme.CKOTheme
 import com.linuk.cko.ui.theme.Cyan400
 import com.linuk.cko.ui.theme.Dimen
@@ -96,7 +99,7 @@ fun PaymentResultSuccessPreview() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
         ) {
-            PaymentResultView(PaymentViewModel(PaymentRepository(), PaymentUtils()), true)
+            PaymentResultView(PaymentViewModel(PaymentRepositoryImpl(), PaymentUtilsImpl()), true)
         }
     }
 }
@@ -108,7 +111,7 @@ fun PaymentResultFailPreview() {
         Surface(
             modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
         ) {
-            PaymentResultView(PaymentViewModel(PaymentRepository(), PaymentUtils()), false)
+            PaymentResultView(PaymentViewModel(PaymentRepositoryImpl(), PaymentUtilsImpl()), false)
         }
     }
 }

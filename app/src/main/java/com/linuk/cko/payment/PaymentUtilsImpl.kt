@@ -1,6 +1,7 @@
 package com.linuk.cko.payment
 
 import com.linuk.cko.R
+import com.linuk.cko.api.PaymentUtils
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -8,9 +9,9 @@ enum class CardType {
     VISA, MASTER, AMEX, DEFAULT
 }
 
-class PaymentUtils @Inject constructor() {
+class PaymentUtilsImpl @Inject constructor() : PaymentUtils {
 
-    fun getCardType(cardNumber: String) = when {
+    override fun getCardType(cardNumber: String) = when {
         cardNumber.isEmpty() -> CardType.DEFAULT
         isVisa(cardNumber) -> CardType.VISA
         isAmex(cardNumber) -> CardType.AMEX
@@ -28,21 +29,21 @@ class PaymentUtils @Inject constructor() {
     private fun isMaster(cardNumber: String) =
         cardNumber.length >= 2 && cardNumber.startsWith("5") && cardNumber[1] - '0' > 0 && cardNumber[1] - '0' <= 7
 
-    fun getCardTypeImageRes(cardType: CardType?) = when (cardType) {
+    override fun getCardTypeImageRes(cardType: CardType?) = when (cardType) {
         CardType.VISA -> R.drawable.visa
         CardType.MASTER -> R.drawable.master
         CardType.AMEX -> R.drawable.amex
         else -> null
     }
 
-    fun isCardNumberUpdateValid(numberLength: Int, cardType: CardType?) = when (cardType) {
+    override fun isCardNumberUpdateValid(numberLength: Int, cardType: CardType?) = when (cardType) {
         CardType.MASTER -> numberLength <= MASTER_NUMBER_DIGITS
         CardType.VISA -> numberLength <= VISA_NUMBER_DIGITS.maxOf { it }
         CardType.AMEX -> numberLength <= AMEX_NUMBER_DIGITS
         else -> numberLength <= MAX_CARD_NUMBER_DIGITS
     }
 
-    fun isCardNumberDigitsValid(numberLength: Int, cardType: CardType?) = when (cardType) {
+    override fun isCardNumberDigitsValid(numberLength: Int, cardType: CardType?) = when (cardType) {
         CardType.MASTER -> numberLength == MASTER_NUMBER_DIGITS
         CardType.VISA -> VISA_NUMBER_DIGITS.contains(numberLength)
         CardType.AMEX -> numberLength == AMEX_NUMBER_DIGITS
@@ -52,7 +53,7 @@ class PaymentUtils @Inject constructor() {
     // Assuming the card number digits are correct, this should be called after
     // [isCardNumberDigitsValid] is validated
     // Detailed algo logic can be found on: https://en.wikipedia.org/wiki/Luhn_algorithm
-    fun isCardNumberValid(number: String?): Boolean {
+    override fun isCardNumberValid(number: String?): Boolean {
         if (number.isNullOrEmpty()) return false
 
         val checkSum = number[number.length - 1] - '0'
@@ -72,29 +73,29 @@ class PaymentUtils @Inject constructor() {
         return expectedCheckSum == checkSum
     }
 
-    fun isCvvValid(cvv: String, cardType: CardType?) = when (cardType) {
-        CardType.MASTER -> cvv.length == Companion.MASTER_CVV_DIGITS
-        CardType.VISA -> cvv.length == Companion.VISA_CVV_DIGITS
-        CardType.AMEX -> cvv.length == Companion.AMEX_CVV_DIGITS
+    override fun isCvvValid(cvv: String, cardType: CardType?) = when (cardType) {
+        CardType.MASTER -> cvv.length == MASTER_CVV_DIGITS
+        CardType.VISA -> cvv.length == VISA_CVV_DIGITS
+        CardType.AMEX -> cvv.length == AMEX_CVV_DIGITS
         else -> false
     }
 
-    fun isCvvUpdateValid(cvv: String, cardType: CardType?) = when (cardType) {
-        CardType.MASTER -> cvv.length <= Companion.MASTER_CVV_DIGITS
-        CardType.VISA -> cvv.length <= Companion.VISA_CVV_DIGITS
-        CardType.AMEX -> cvv.length <= Companion.AMEX_CVV_DIGITS
-        else -> cvv.length <= Companion.DEFAULT_CVV_DIGITS
+    override fun isCvvUpdateValid(cvv: String, cardType: CardType?) = when (cardType) {
+        CardType.MASTER -> cvv.length <= MASTER_CVV_DIGITS
+        CardType.VISA -> cvv.length <= VISA_CVV_DIGITS
+        CardType.AMEX -> cvv.length <= AMEX_CVV_DIGITS
+        else -> cvv.length <= DEFAULT_CVV_DIGITS
     }
 
-    fun isMonthValid(month: String) =
+    override fun isMonthValid(month: String) =
         month.length == 2 && month.toIntOrNull()?.let { it in 1..12 } == true
 
-    fun isMonthUpdateValid(month: String) =
+    override fun isMonthUpdateValid(month: String) =
         month.isEmpty() || month.toIntOrNull()?.let { it <= 12 } == true
 
-    fun isYearValid(year: String) = year.length == 4 && year.toInt() >= CURRENT_YEAR
+    override fun isYearValid(year: String) = year.length == 4 && year.toInt() >= CURRENT_YEAR
 
-    fun isYearUpdateValid(year: String) =
+    override fun isYearUpdateValid(year: String) =
         year.length <= 3 || (year.length == 4 && year.toInt() >= CURRENT_YEAR)
 
     companion object {

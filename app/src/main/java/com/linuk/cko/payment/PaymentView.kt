@@ -3,19 +3,22 @@ package com.linuk.cko.payment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import com.linuk.cko.payment.ViewType.PaymentDetails
-import com.linuk.cko.payment.ViewType.PaymentResult
-import com.linuk.cko.payment.ViewType.ThreeDS
+import com.linuk.cko.payment.views.PaymentDetailsView
+import com.linuk.cko.payment.views.PaymentResultView
+import com.linuk.cko.payment.views.ThreeDSView
 
 @Composable
 fun PaymentView(viewModel: PaymentViewModel) {
     val viewType by viewModel.viewType.observeAsState()
-    val paymentUtils = PaymentUtils()
+    val paymentUtils = PaymentUtilsImpl()
 
     when (viewType) {
-        PaymentDetails -> PaymentDetailsView(viewModel, paymentUtils)
-        is PaymentResult -> PaymentResultView(viewModel, (viewType as PaymentResult).isSuccessful)
-        is ThreeDS -> ThreeDSView(viewModel, (viewType as ThreeDS).url)
+        ViewType.PaymentDetails -> PaymentDetailsView(viewModel, paymentUtils)
+        is ViewType.PaymentResult -> PaymentResultView(
+            viewModel,
+            (viewType as ViewType.PaymentResult).isSuccessful
+        )
+        is ViewType.ThreeDS -> ThreeDSView(viewModel, (viewType as ViewType.ThreeDS).url)
         else -> {}
     }
 }

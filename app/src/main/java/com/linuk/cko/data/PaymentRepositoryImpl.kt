@@ -1,17 +1,18 @@
 package com.linuk.cko.data
 
 import com.google.gson.Gson
-import com.linuk.cko.payment.PaymentUtils.Companion.BASE_URL
-import com.linuk.cko.payment.PaymentUtils.Companion.PAYMENT_PATH
+import com.linuk.cko.api.PaymentRepository
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.BASE_URL
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.PAYMENT_PATH
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import javax.inject.Inject
 
-class PaymentRepository @Inject constructor() {
+class PaymentRepositoryImpl @Inject constructor() : PaymentRepository {
     private val client by lazy { OkHttpClient() }
 
-    fun makePayment(
+    override fun makePayment(
         cardDetails: CardDetails,
         onSuccess: (redirectUrl: String) -> Unit,
         onFailure: (message: String) -> Unit

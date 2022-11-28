@@ -1,7 +1,8 @@
 package com.linuk.cko.data
 
 import com.google.gson.annotations.SerializedName
-import com.linuk.cko.payment.PaymentUtils
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.FAILURE_PAYMENT_REDIRECTION_URL
+import com.linuk.cko.payment.PaymentUtilsImpl.Companion.SUCCESS_PAYMENT_REDIRECTION_URL
 
 
 data class CardDetails(
@@ -29,8 +30,8 @@ data class PaymentRequestBody(
             expiryMonth = cardDetails.expiryMonth,
             expiryYear = cardDetails.expiryYear,
             cvv = cardDetails.cvv,
-            successUrl = PaymentUtils.SUCCESS_PAYMENT_REDIRECTION_URL,
-            failureUrl = PaymentUtils.FAILURE_PAYMENT_REDIRECTION_URL,
+            successUrl = SUCCESS_PAYMENT_REDIRECTION_URL,
+            failureUrl = FAILURE_PAYMENT_REDIRECTION_URL,
         )
     }
 }

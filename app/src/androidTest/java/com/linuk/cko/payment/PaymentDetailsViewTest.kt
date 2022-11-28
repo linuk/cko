@@ -63,7 +63,7 @@ class PaymentDetailsViewTest {
     @Test
     fun pressPayButtonShouldTriggerMaybePayment() {
         // given a valid credit card input
-        rule.setContent { PaymentDetailsView(viewModel, utils) }
+        rule.setContent { PaymentDetailsView(viewModel) }
         rule.onNodeWithTag(CARD_NUMBER_FIELD_TEST_TAG).performTextInput(DEBUG_CARD_VALID_NUMBER)
         rule.onNodeWithTag(EXPIRY_MONTH_FIELD_TEST_TAG).performTextInput(DEBUG_CARD_EXP_MONTH)
         rule.onNodeWithTag(EXPIRY_YEAR_FIELD_TEST_TAG).performTextInput(DEBUG_CARD_EXP_YEAR)
@@ -75,7 +75,7 @@ class PaymentDetailsViewTest {
     }
 
     private fun validateTextField(fieldLiveData: LiveData<String>, testTag: String) {
-        rule.setContent { PaymentDetailsView(viewModel, utils) }
+        rule.setContent { PaymentDetailsView(viewModel) }
         fieldLiveData.observeForever(stringObserver)
         // initial number
         verify(stringObserver).onChanged("")

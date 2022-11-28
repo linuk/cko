@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName
 import com.linuk.cko.payment.PaymentUtilsImpl.Companion.FAILURE_PAYMENT_REDIRECTION_URL
 import com.linuk.cko.payment.PaymentUtilsImpl.Companion.SUCCESS_PAYMENT_REDIRECTION_URL
 
+enum class CardType {
+    VISA, MASTER, AMEX, DEFAULT
+}
 
 data class CardDetails(
     val number: String,

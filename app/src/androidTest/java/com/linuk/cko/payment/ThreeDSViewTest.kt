@@ -22,7 +22,7 @@ import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 
 @RunWith(AndroidJUnit4::class)
-class ThreeDsViewTest {
+class ThreeDSViewTest {
 
     @get:Rule
     val rule = createComposeRule()

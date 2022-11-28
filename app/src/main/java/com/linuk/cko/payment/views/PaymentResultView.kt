@@ -29,6 +29,11 @@ import com.linuk.cko.ui.theme.Cyan400
 import com.linuk.cko.ui.theme.Dimen
 import com.linuk.cko.ui.theme.Red400
 
+/**
+ * A page indicates the payment result depends on the passed parameter [isSuccessful].
+ * If [isSuccessful] is `true`, shows a content of transaction being successfully made
+ * If [isSuccessful] is `false`, shows a content of failed transaction
+ */
 @Composable
 fun PaymentResultView(viewModel: PaymentViewModel, isSuccessful: Boolean) {
     val activity = LocalContext.current as? Activity

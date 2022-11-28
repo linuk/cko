@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.linuk.cko.api.PaymentRepository
 import com.linuk.cko.api.PaymentUtils
+import com.linuk.cko.data.CardType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

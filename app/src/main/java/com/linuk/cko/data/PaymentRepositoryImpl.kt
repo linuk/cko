@@ -33,7 +33,6 @@ class PaymentRepositoryImpl @Inject constructor() : PaymentRepository {
                     )
                 } else {
                     onFailure(response.message)
-                    // TODO: handle failed response or null body
                 }
             }
         })

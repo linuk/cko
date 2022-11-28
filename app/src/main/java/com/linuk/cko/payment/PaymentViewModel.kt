@@ -3,19 +3,24 @@ package com.linuk.cko.payment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.linuk.cko.data.CardDetails
 import com.linuk.cko.api.PaymentRepository
-import com.linuk.cko.payment.CardType
 import com.linuk.cko.api.PaymentUtils
+import com.linuk.cko.data.CardDetails
+import com.linuk.cko.data.CardType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+/**
+ * Contains states to control [PaymentView] and form fields in [PaymentDetailsView].
+ */
 @HiltViewModel
 class PaymentViewModel @Inject constructor(
     private val repository: PaymentRepository,
     private val utils: PaymentUtils,
 ) : ViewModel() {
+    // when screen/view to show in [PaymentView]
     private val _viewType by lazy { MutableLiveData<ViewType>(ViewType.PaymentDetails) }
+    // field values
     private val _cardNumber by lazy { MutableLiveData("") }
     private val _isCardNumberInvalid by lazy { MutableLiveData(false) }
     private val _expiryMonth by lazy { MutableLiveData("") }
@@ -23,7 +28,9 @@ class PaymentViewModel @Inject constructor(
     private val _cvv by lazy { MutableLiveData("") }
     private val _cardType by lazy { MutableLiveData(CardType.DEFAULT) }
     private val _buttonEnabled by lazy { MutableLiveData(false) }
+    // is the payment form loading during the payment request
     private val _isLoading by lazy { MutableLiveData(false) }
+    // error message for [PaymentDetailsView].
     private val _errorMessage by lazy { MutableLiveData<String?>(null) }
 
     val viewType: LiveData<ViewType> by lazy { _viewType }
@@ -101,6 +108,8 @@ class PaymentViewModel @Inject constructor(
             performMakingPayment()
         }
     }
+
+    fun getCardTypeImageRes() = utils.getCardTypeImageRes(cardType.value)
 
     private fun performMakingPayment() {
         val cardDetails = CardDetails(

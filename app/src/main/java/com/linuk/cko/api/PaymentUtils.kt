@@ -1,6 +1,6 @@
 package com.linuk.cko.api
 
-import com.linuk.cko.payment.CardType
+import com.linuk.cko.data.CardType
 
 interface PaymentUtils {
     fun getCardType(cardNumber: String): CardType

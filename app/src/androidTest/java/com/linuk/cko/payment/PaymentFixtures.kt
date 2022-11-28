@@ -3,6 +3,7 @@ package com.linuk.cko.payment
 import com.linuk.cko.api.PaymentRepository
 import com.linuk.cko.api.PaymentUtils
 import com.linuk.cko.data.CardDetails
+import com.linuk.cko.data.CardType
 
 object PaymentFixtures {
     // Assuming all inputs update are valid

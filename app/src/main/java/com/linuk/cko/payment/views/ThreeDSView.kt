@@ -24,6 +24,10 @@ import com.linuk.cko.payment.PaymentViewModel
 import com.linuk.cko.payment.ViewType
 import com.linuk.cko.ui.theme.CKOTheme
 
+/**
+ * WebView for making a ThreeDS check, redirect to [PaymentResultView] when it redirects to a
+ * relevant URL.
+ */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ThreeDSView(viewModel: PaymentViewModel, url: String) {

@@ -16,9 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.linuk.cko.R
+import com.linuk.cko.data.CardType
 import com.linuk.cko.data.PaymentRepositoryImpl
-import com.linuk.cko.payment.CardType
-import com.linuk.cko.api.PaymentUtils
 import com.linuk.cko.payment.PaymentUtilsImpl
 import com.linuk.cko.payment.PaymentUtilsImpl.Companion.DEBUG_CARD_CVV
 import com.linuk.cko.payment.PaymentUtilsImpl.Companion.DEBUG_CARD_EXP_MONTH
@@ -40,13 +39,12 @@ internal const val CVV_FIELD_TEST_TAG = "CVV_FIELD_TEST_TAG"
 internal const val BUTTON_TEST_TAG = "BUTTON_TEST_TAG"
 
 /**
- * Initial Screen for the payment view
- * TODO: Validate card number
+ * Initial Screen contains a credit card input form for payment making.
  * TODO: Format card number
  */
 @OptIn(ExperimentalComposeUiApi::class) // For Keyboard controller
 @Composable
-fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
+fun PaymentDetailsView(viewModel: PaymentViewModel) {
     val cardNumber by viewModel.cardNumber.observeAsState("")
     val isCardNumberInvalid by viewModel.isCardNumberInvalid.observeAsState(false)
     val expiryMonth by viewModel.expiryMonth.observeAsState("")
@@ -84,7 +82,7 @@ fun PaymentDetailsView(viewModel: PaymentViewModel, utils: PaymentUtils) {
                     enabled = !isLoading
                 )
 
-                utils.getCardTypeImageRes(cardType)?.let { imageRes ->
+                viewModel.getCardTypeImageRes()?.let { imageRes ->
                     Image(
                         painter = painterResource(imageRes),
                         contentDescription = cardType.name,
@@ -172,7 +170,6 @@ fun DefaultPreview() {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
             PaymentDetailsView(
                 PaymentViewModel(PaymentRepositoryImpl(), PaymentUtilsImpl()),
-                PaymentUtilsImpl()
             )
         }
     }

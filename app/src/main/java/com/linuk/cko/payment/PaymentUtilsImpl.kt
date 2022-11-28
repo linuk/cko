@@ -2,13 +2,13 @@ package com.linuk.cko.payment
 
 import com.linuk.cko.R
 import com.linuk.cko.api.PaymentUtils
+import com.linuk.cko.data.CardType
 import java.time.LocalDate
 import javax.inject.Inject
 
-enum class CardType {
-    VISA, MASTER, AMEX, DEFAULT
-}
-
+/**
+ * Used for credit card credential field validation and common shared configuration
+ */
 class PaymentUtilsImpl @Inject constructor() : PaymentUtils {
 
     override fun getCardType(cardNumber: String) = when {
